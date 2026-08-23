@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>J&G Diamant · Kalkulation weiterführen</title>
+<style>
+:root{--bg:#050505;--panel:#0d0d0c;--gold:#d9bc6a;--gold2:#a9822f;--txt:#f4efe5;--muted:#aaa49a;--line:rgba(217,188,106,.24)}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(800px 520px at 50% -10%,rgba(217,188,106,.12),transparent 60%),var(--bg);color:var(--txt);font-family:Arial,sans-serif}.wrap{width:min(920px,calc(100% - 28px));margin:auto;padding:44px 0 70px}.brand{text-align:center;margin-bottom:28px}.brand img{width:116px;max-width:35vw;filter:drop-shadow(0 18px 40px rgba(217,188,106,.16))}.brand h1{font:32px Georgia,serif;color:var(--gold);letter-spacing:.13em;margin:12px 0 4px}.brand p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px}.ey{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold)}h2{font:30px Georgia,serif;margin:10px 0 12px}.price{font:40px Georgia,serif;color:var(--gold);margin:14px 0}.small{font-size:13px;line-height:1.6;color:var(--muted)}input{width:100%;background:#080808;border:1px solid rgba(255,255,255,.11);color:white;border-radius:10px;padding:13px;margin:6px 0}.btn{width:100%;border:1px solid var(--line);border-radius:999px;padding:13px 18px;background:transparent;color:var(--gold);font-weight:700;margin-top:9px}.btn.gold{border:0;background:linear-gradient(135deg,#e8cf82,#aa8030);color:#080808}.hidden{display:none!important}.msg{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.55}.ok{color:#bfe2bc}.warn{color:#e9c981}.summary{display:grid;gap:8px;margin-top:15px}.summary div{display:flex;justify-content:space-between;gap:15px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}.summary span:first-child{color:var(--muted)}a{color:inherit;text-decoration:none}@media(max-width:760px){.grid{grid-template-columns:1fr}.wrap{padding-top:26px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><img src="assets/diamond-transparent.png" alt="J&G Diamant"><h1>J&G DIAMANT</h1><p>Kalkulation sicher in J&G OS weiterführen</p></div>
+  <div class="grid">
+    <section class="panel">
+      <div class="ey">Ihre Kalkulation</div><h2>Richtwert sichern</h2>
+      <div class="price" id="price">CHF —</div>
+      <div class="summary" id="summary"></div>
+      <p class="small">Der Richtwert bleibt unverbindlich. Nach der Anmeldung wird die Kalkulation Ihrem persönlichen Kundenkonto zugeordnet und bleibt dort für die weitere Bearbeitung verfügbar.</p>
+    </section>
+    <section class="panel" id="authPanel">
+      <div class="ey">J&G OS</div><h2 id="authTitle">Anmelden</h2>
+      <div id="loginBox"><input id="email" type="email" placeholder="E-Mail"><input id="password" type="password" placeholder="Passwort"><button class="btn gold" id="loginBtn">ANMELDEN & KALKULATION SPEICHERN</button><button class="btn" id="showRegister">NEUES KUNDENKONTO</button></div>
+      <div id="registerBox" class="hidden"><input id="name" placeholder="Vor- und Nachname"><input id="regEmail" type="email" placeholder="E-Mail"><input id="regPassword" type="password" placeholder="Passwort (mind. 8 Zeichen)"><button class="btn gold" id="registerBtn">KONTO ERSTELLEN</button><button class="btn" id="showLogin">ZUR ANMELDUNG</button></div>
+      <div class="msg" id="msg"></div>
+    </section>
+    <section class="panel hidden" id="donePanel" style="grid-column:1/-1">
+      <div class="ey">Gespeichert</div><h2>Kalkulation ist im Kundenkonto</h2>
+      <p class="msg ok" id="doneMsg">Ihre Kalkulation wurde erfolgreich J&G OS zugeordnet.</p>
+      <div class="grid"><button class="btn gold" id="requestBtn">ALS ANFRAGE WEITERFÜHREN</button><button class="btn" id="openOsBtn">J&G OS ÖFFNEN</button></div>
+      <div class="msg" id="requestMsg"></div>
+    </section>
+  </div>
+</div>
+<script>
+const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
+const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
+const SK='jgos:session';
+const DK='jgos:calculator_draft';
+const $=s=>document.querySelector(s);
+let draft=null,session=null,calcId=null;
+try{draft=JSON.parse(localStorage.getItem(DK)||'null')}catch{}
+try{session=JSON.parse(localStorage.getItem(SK)||'null')}catch{}
+const label={home:'J&G Home',mobility:'J&G Mobility',wunscherfueller:'Wunscherfüller',concierge:'Concierge'};
+function money(n){return 'CHF '+Number(n||0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function hdr(){const h={apikey:K,'Content-Type':'application/json'};if(session?.access_token)h.Authorization='Bearer '+session.access_token;return h}
+async function api(path,opt={}){const r=await fetch(U+path,{...opt,headers:{...hdr(),...(opt.headers||{})}});const t=await r.text();let d=null;try{d=t?JSON.parse(t):null}catch{d=t}if(!r.ok)throw Error(d?.message||d?.error_description||t||'Fehler');return d}
+function renderDraft(){if(!draft){$('#price').textContent='Kein Richtwert gefunden';$('#summary').innerHTML='<div><span>Hinweis</span><b>Bitte zuerst auf der Website kalkulieren.</b></div>';return}$('#price').textContent=money(draft.estimated_total_chf);$('#summary').innerHTML=`<div><span>Bereich</span><b>${label[draft.category]||draft.category||'J&G'}</b></div><div><span>Aufwand</span><b>${Number(draft.hours||0)} Std.</b></div><div><span>Material/Fremdkosten</span><b>${money(draft.material)}</b></div>${draft.description?`<div><span>Beschreibung</span><b>${String(draft.description).replace(/[<>]/g,'')}</b></div>`:''}`}
+async function login(){const m=$('#msg');m.textContent='Anmeldung …';try{session=await api('/auth/v1/token?grant_type=password',{method:'POST',body:JSON.stringify({email:$('#email').value.trim(),password:$('#password').value})});localStorage.setItem(SK,JSON.stringify(session));await saveCalculation()}catch(e){m.textContent=e.message}}
+async function register(){const m=$('#msg'),name=$('#name').value.trim(),email=$('#regEmail').value.trim(),password=$('#regPassword').value;if(!name||!email||password.length<8){m.textContent='Bitte alle Angaben ausfüllen; Passwort mindestens 8 Zeichen.';return}m.textContent='Konto wird erstellt …';try{const d=await api('/auth/v1/signup',{method:'POST',body:JSON.stringify({email,password,data:{full_name:name}})});if(d?.access_token){session=d;localStorage.setItem(SK,JSON.stringify(session));await saveCalculation()}else{m.innerHTML='Konto erstellt. Bitte bestätigen Sie zuerst die E-Mail und melden Sie sich danach hier an.';$('#registerBox').classList.add('hidden');$('#loginBox').classList.remove('hidden');$('#email').value=email}}catch(e){m.textContent=e.message}}
+async function saveCalculation(){if(!draft)throw Error('Keine Kalkulation vorhanden.');$('#msg').textContent='Kalkulation wird sicher gespeichert …';const body={p_calculation_type:draft.category||'general',p_input_data:{hours:Number(draft.hours||0),material:Number(draft.material||0),description:draft.description||''},p_result_data:{title:draft.title||'Website-Kalkulation',estimate_type:'unverbindlicher_richtwert'},p_estimated_total_chf:Number(draft.estimated_total_chf||0),p_source:'website'};calcId=await api('/rest/v1/rpc/register_calculation',{method:'POST',body:JSON.stringify(body)});$('#authPanel').classList.add('hidden');$('#donePanel').classList.remove('hidden');$('#doneMsg').textContent='Ihre Kalkulation wurde erfolgreich gespeichert. Ihr Kundenkonto gilt damit als qualifiziert genutzt und wird nicht nach 24 Stunden wegen Inaktivität gesperrt.'}
+async function createRequest(){const m=$('#requestMsg');m.textContent='Anfrage wird erstellt …';try{await api('/rest/v1/requests',{method:'POST',headers:{Prefer:'return=minimal'},body:JSON.stringify({user_id:session.user.id,category:draft.category||'concierge',title:'Kalkulation weiterführen · '+(label[draft.category]||'J&G'),description:[draft.description||'',`Unverbindlicher Website-Richtwert: ${money(draft.estimated_total_chf)}`,`Kalkulations-ID: ${calcId||'—'}`].filter(Boolean).join('\n')})});m.className='msg ok';m.textContent='Anfrage wurde erstellt und erscheint jetzt in J&G OS.';$('#requestBtn').disabled=true}catch(e){m.className='msg warn';m.textContent=e.message}}
+$('#loginBtn').onclick=login;$('#registerBtn').onclick=register;$('#showRegister').onclick=()=>{$('#loginBox').classList.add('hidden');$('#registerBox').classList.remove('hidden');$('#msg').textContent=''};$('#showLogin').onclick=()=>{$('#registerBox').classList.add('hidden');$('#loginBox').classList.remove('hidden');$('#msg').textContent=''};$('#requestBtn').onclick=createRequest;$('#openOsBtn').onclick=()=>location.href='app.html';
+renderDraft();if(session?.access_token&&draft)saveCalculation().catch(e=>{$('#msg').textContent=e.message;session=null;localStorage.removeItem(SK)});
+</script>
+</body></html>
