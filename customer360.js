@@ -1,0 +1,14 @@
+(()=>{
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'CHF '+Number(n||0).toLocaleString('de-CH',{minimumFractionDigits:2,maximumFractionDigits:2});
+function pill(label,value){return `<div class="c360-kpi"><small>${esc(label)}</small><b>${esc(value)}</b></div>`}
+function item(kind,title,meta,status){return `<div class="c360-item"><div><small>${esc(kind)}</small><b>${esc(title||'—')}</b><span>${esc(meta||'')}</span></div><em>${esc(status||'')}</em></div>`}
+async function enhance(){if(!window.JGOS360?.getContext)return;const ctx=window.JGOS360.getContext();if(!ctx?.staff||!ctx?.customerId)return;const d=await window.JGOS360.fetchCustomer(ctx.customerId);const host=$('#customerRelations');if(!host)return;
+const totals={requests:d.requests.length,projects:d.projects.length,offers:d.offers.length,invoices:d.invoices.length,calc:d.calculations.length,mobility:d.mobility.length};
+const billed=d.invoices.reduce((s,x)=>s+Number(x.total_chf||0),0),paid=d.invoices.filter(x=>x.status==='paid').reduce((s,x)=>s+Number(x.total_chf||0),0);
+const timeline=[...d.calculations.map(x=>({date:x.created_at,html:item('Kalkulation',x.calculation_type||'Richtwert',money(x.estimated_total_chf),'Gespeichert')})),...d.requests.map(x=>({date:x.created_at,html:item('Anfrage',x.title,x.category,x.status)})),...d.projects.map(x=>({date:x.created_at,html:item('Projekt',x.title,money(x.budget_chf),x.status)})),...d.offers.map(x=>({date:x.created_at,html:item('Offerte',x.offer_number||x.title,money(x.total_chf),x.status)})),...d.invoices.map(x=>({date:x.created_at,html:item('Rechnung',x.invoice_number||x.title,money(x.total_chf),x.status)})),...d.services.map(x=>({date:x.created_at,html:item('Service',x.service_type,x.location,x.status)})),...d.mobility.map(x=>({date:x.created_at,html:item('Mobility',`${x.pickup||'—'} → ${x.destination||'—'}`,x.starts_at?new Date(x.starts_at).toLocaleString('de-CH'):'',x.status)})),...d.messages.map(x=>({date:x.created_at,html:item('Nachricht',x.body?.slice(0,80),'',x.read_at?'Gelesen':'Neu')}))].sort((a,b)=>new Date(b.date)-new Date(a.date));
+host.innerHTML=`<div class="c360-head"><div><small>J&G CUSTOMER 360</small><h3>Komplette Kundenakte</h3></div><span>${timeline.length} Vorgänge</span></div><div class="c360-kpis">${pill('Kalkulationen',totals.calc)}${pill('Anfragen',totals.requests)}${pill('Projekte',totals.projects)}${pill('Offerten',totals.offers)}${pill('Rechnungen',totals.invoices)}${pill('Mobility',totals.mobility)}${pill('Fakturiert',money(billed))}${pill('Bezahlt',money(paid))}</div><div class="c360-timeline">${timeline.map(x=>x.html).join('')||'<div class="empty">Noch keine Vorgänge.</div>'}</div>`;
+}
+window.JGCustomer360={enhance};
+})();
