@@ -21,7 +21,7 @@ Status-Legende:
 - ✅ Kundenreaktion auf Offerte und Status-Synchronisierung sind technisch gekoppelt
 - ✅ Angenommene Offerte kann technisch in eine Rechnung überführt werden
 - 🧪 Rechnung, Zahlungsstatus und Dokumentenarchiv müssen im realen Durchlauf bestätigt werden
-- ✅ RLS-/Rollen-Hardening für zentrale Kunden-, Projekt-, Offerten-, Rechnungs- und Journey-Daten ist vorbereitet und angewendet
+- ✅ RLS-/Rollen-Hardening für zentrale Kunden-, Projekt-, Offerten-, Rechnungs- und Journey-Daten ist angewendet
 - 🧪 Rollen und Kundendatenschutz müssen mit mindestens zwei getrennten Testkonten praktisch verifiziert werden
 - ✅ Kundenseitige Marken-/Sprachschicht nutzt Executive Fahrservice sowie Diamant, Black, Private
 - 🧪 Keine sichtbaren Platzhalter, Testtexte oder falschen Service-Begriffe im vollständigen Browserdurchlauf
@@ -29,9 +29,11 @@ Status-Legende:
 - 🧪 Desktop-Nutzung
 - ✅ Guards für Sessions, Doppelklicks, Offline-Zustand und typische Eingabefehler sind technisch vorhanden
 - 🧪 Fehlerzustände müssen im echten Browser provoziert und bewertet werden
+- ⏳ Supabase Leaked Password Protection vor öffentlichem Launch aktivieren
 - ⏳ Finale Unternehmens-, Zahlungs- und Kontaktdaten vor öffentlichem Launch eintragen
 - ⏳ Finale Fahrzeug-/Lifestyle-Bildwelt ergänzen oder bewusst ohne Fremd-Stockbilder veröffentlichen
-- ⏳ Vercel-Projekt anlegen/verbinden und echten Preview-/Production-Deploy durchführen
+- ✅ GitHub `main` ist mit dem Vercel-Projekt `j-g-diamant-os` verbunden; automatische Deployments werden erfolgreich erstellt
+- 🧪 Production-URL und Auth-Redirects im realen Browser vollständig abnehmen
 
 ## Marken-Gate
 
@@ -41,17 +43,17 @@ Der erste Luxury-Pass, Private-Client-Dashboard, Executive-Journey-Inszenierung,
 
 ## Deployment
 
-GitHub `main` ist die aktuelle Release-Basis. Im derzeit verbundenen Vercel-Team wurde zuletzt noch kein Projekt gefunden. Deshalb gilt Vercel aktuell als offener Launch-Schritt und nicht als bereits bestandenes Gate.
+GitHub `main` ist die aktuelle Release-Basis. Das Vercel-Projekt `j-g-diamant-os` ist mit `grjoshua-maker/J-G-Diamant-OS` verbunden; erfolgreiche Vercel-Statuschecks wurden auf aktuellen Commits bestätigt. Die sichtbare Vercel-URL lautet `j-g-diamant-os.vercel.app`. Die Produktionsabnahme und die Supabase-Redirect-Konfiguration bleiben vor dem öffentlichen Launch zu bestätigen.
 
 ## Nächste Release-Reihenfolge
 
-1. Lokaler/Preview-Browser-Smoke-Test aller Ansichten und Scripts.
+1. Production-/Preview-Browser-Smoke-Test aller Ansichten und Scripts.
 2. Zwei-Testkonten-Test: Kunde vs. Admin/Mitarbeiter.
 3. Kompletter Geschäftsfall: Registrierung → Executive Journey → Prüfung → Offerte → Annahme → Durchführung → Rechnung → Zahlung → Archiv.
-4. Passwort-Reset, E-Mail-Wechsel, abgelaufene Session und Fehlerfälle testen.
+4. Passwort-Reset, E-Mail-Wechsel, Session-Erneuerung und Fehlerfälle testen.
 5. iPhone/Safari und Desktop visuell/funktional abnehmen.
-6. Finale Unternehmens-/Kontakt-/Zahlungsdaten setzen.
-7. Vercel-Projekt verbinden, Preview deployen, nochmals End-to-End testen.
+6. Supabase Leaked Password Protection aktivieren und Auth-Redirects final bestätigen.
+7. Finale Unternehmens-/Kontakt-/Zahlungsdaten setzen.
 8. Production-Freigabe.
 
 ## Definition „Release Ready“
