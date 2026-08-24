@@ -13,5 +13,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Run release smoke
+      - name: Run static release smoke
         run: node scripts/release-smoke.mjs
+      - name: Install Playwright
+        run: npm install --no-save playwright@1.55.0 && npx playwright install --with-deps chromium
+      - name: Start local preview
+        run: python3 -m http.server 4173 >/tmp/jg-http.log 2>&1 &
+      - name: Run desktop and mobile browser smoke
+        run: node scripts/browser-smoke.mjs
