@@ -2,7 +2,7 @@
 const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
 const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
 const SK='jgos:session';
-const VERSION='20260824-2305';
+const VERSION='20260824-2318';
 
 function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
 function store(s){s?localStorage.setItem(SK,JSON.stringify(s)):localStorage.removeItem(SK)}
@@ -20,6 +20,11 @@ async function refresh(s){
 function messageEl(btn){
   let m=document.querySelector('#jgosProfileSaveMsg');
   if(!m){m=document.createElement('div');m.id='jgosProfileSaveMsg';m.style.cssText='margin-top:12px;color:#d9bc6a;font-size:14px;line-height:1.4';btn.parentElement?.insertAdjacentElement('afterend',m)}
+  return m;
+}
+function requestMessageEl(btn){
+  let m=document.querySelector('#jgosRequestMsg');
+  if(!m){m=document.createElement('div');m.id='jgosRequestMsg';m.style.cssText='margin-top:12px;color:#d9bc6a;font-size:14px;line-height:1.4';btn.insertAdjacentElement('afterend',m)}
   return m;
 }
 
@@ -65,6 +70,34 @@ async function saveProfile(btn){
   finally{btn.disabled=false}
 }
 
+async function submitRequest(btn){
+  const m=requestMessageEl(btn);
+  const category=document.querySelector('#reqCategory')?.value||'concierge';
+  const title=document.querySelector('#reqTitle')?.value.trim()||'';
+  const description=document.querySelector('#reqDesc')?.value.trim()||'';
+  if(!title){m.textContent='Bitte einen Titel eingeben.';return}
+  if(!description){m.textContent='Bitte Ihr Anliegen beschreiben.';return}
+  let s=session();
+  if(!s?.access_token||!s?.user?.id){m.textContent='Sitzung abgelaufen. Bitte erneut anmelden.';return}
+  const body={user_id:s.user.id,category,title,description};
+  const doPost=async()=>fetch(U+'/rest/v1/requests?select=*',{
+    method:'POST',cache:'no-store',
+    headers:{apikey:K,Authorization:'Bearer '+s.access_token,'Content-Type':'application/json',Prefer:'return=representation'},
+    body:JSON.stringify(body)
+  });
+  btn.disabled=true;m.textContent='Anfrage wird gesendet …';
+  try{
+    let r=await doPost();
+    if(r.status===401){s=await refresh(s);r=await doPost()}
+    if(!r.ok)throw new Error((await r.text())||('HTTP '+r.status));
+    document.querySelector('#reqTitle').value='';
+    document.querySelector('#reqDesc').value='';
+    m.textContent='✓ Ihre Anfrage wurde erfolgreich gesendet.';
+    setTimeout(()=>location.reload(),700);
+  }catch(e){m.textContent='Anfrage konnte nicht gesendet werden: '+e.message}
+  finally{btn.disabled=false}
+}
+
 function installProfileHotfix(){
   const btn=document.querySelector('#saveMyData');
   if(!btn||btn.dataset.jgosSaveFix==='1')return;
@@ -74,10 +107,20 @@ function installProfileHotfix(){
     saveProfile(btn);
   },true);
 }
+function installRequestHotfix(){
+  const btn=document.querySelector('#createRequest');
+  if(!btn||btn.dataset.jgosRequestFix==='1')return;
+  btn.dataset.jgosRequestFix='1';
+  btn.addEventListener('click',e=>{
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    submitRequest(btn);
+  },true);
+}
+function installHotfixes(){installProfileHotfix();installRequestHotfix()}
 
 const base=document.createElement('script');
 base.src='app-base.js?v='+VERSION;base.async=false;
-base.onload=()=>{installProfileHotfix();setTimeout(installProfileHotfix,300)};
+base.onload=()=>{installHotfixes();setTimeout(installHotfixes,300)};
 base.onerror=()=>{const m=document.querySelector('#loginMsg');if(m)m.textContent='J&G OS konnte nicht geladen werden.'};
 document.head.appendChild(base);
 })();
