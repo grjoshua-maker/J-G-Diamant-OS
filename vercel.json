@@ -6,11 +6,6 @@
       "source": "/app",
       "destination": "/live",
       "permanent": false
-    },
-    {
-      "source": "/app.html",
-      "destination": "/live",
-      "permanent": false
     }
   ],
   "headers": [
