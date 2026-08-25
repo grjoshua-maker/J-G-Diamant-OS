@@ -2,7 +2,7 @@
 const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
 const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
 const SK='jgos:session';
-const VERSION='20260825-2342';
+const VERSION='20260825-2348';
 function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
 function store(s){s?localStorage.setItem(SK,JSON.stringify(s)):localStorage.removeItem(SK)}
 async function refresh(s){if(!s?.refresh_token)return s;const r=await fetch(U+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token}),cache:'no-store'});if(!r.ok)return s;const n=await r.json();store(n);return n}
@@ -25,5 +25,6 @@ loadScript('employee-access.js','jgos-employee-access');
 loadScript('employee-access-nav-fix.js','jgos-employee-nav-fix');
 loadScript('mobile-menu-close.js','jgos-mobile-menu-close');
 loadScript('service-order-runtime.js','jgos-service-order-runtime');
+loadScript('customer-service-fix.js','jgos-customer-service-fix');
 const base=document.createElement('script');base.src='app-base.js?v='+VERSION;base.async=false;base.onload=()=>{installHotfixes();let tries=0;const timer=setInterval(()=>{tries++;if(installAdminRequestView()||tries>20)clearInterval(timer)},250);setTimeout(installHotfixes,300)};base.onerror=()=>{const m=document.querySelector('#loginMsg');if(m)m.textContent='J&G OS konnte nicht geladen werden.'};document.head.appendChild(base);
 })();
