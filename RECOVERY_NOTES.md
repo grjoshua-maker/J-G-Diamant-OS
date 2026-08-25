@@ -1,1 +1,0 @@
-Recovery checkpoint: technical system role remains admin for full legacy staff compatibility; visible role is CEO via profiles.display_role. Existing request/project data remains intact. Mobile menu closes on outside click.
