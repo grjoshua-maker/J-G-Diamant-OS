@@ -1,0 +1,17 @@
+@media (max-width: 700px){
+  #poOfferOverlay{padding:8px!important;}
+  #poOfferOverlay>div{margin:1vh auto!important;padding:14px!important;border-radius:18px!important;max-width:100%!important;overflow-x:hidden;}
+  #poOfferOverlay .panel.inset{padding:14px!important;}
+  #poOfferOverlay .ph{align-items:center;gap:10px;}
+  #poLines{display:grid;gap:12px;}
+  #poLines .poLine{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:10px!important;margin-top:0!important;padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:16px;align-items:end!important;}
+  #poLines .poLine>div:first-child{grid-column:1/-1;}
+  #poLines .poLine>div:nth-child(4){grid-column:1/2;}
+  #poLines .poLine>button{grid-column:2/3;width:100%;min-height:52px;}
+  #poLines .poLine input{min-width:0!important;width:100%!important;box-sizing:border-box;}
+  #poLines .poLine label{display:block;margin-bottom:5px;font-size:14px;}
+  #poOfferOverlay #poAddLine{white-space:nowrap;}
+  #poOfferOverlay #poSaveOffer{font-size:18px;line-height:1.2;padding:16px 12px;}
+  #poOfferOverlay #poVatRate{width:90px!important;}
+  #poOfferOverlay .panel.inset>div[style*="grid-template-columns:1fr auto"]{grid-template-columns:minmax(0,1fr) auto!important;align-items:center;}
+}
