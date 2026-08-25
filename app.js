@@ -2,7 +2,7 @@
 const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
 const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
 const SK='jgos:session';
-const VERSION='20260824-2337';
+const VERSION='20260825-2208';
 
 function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
 function store(s){s?localStorage.setItem(SK,JSON.stringify(s)):localStorage.removeItem(SK)}
@@ -22,5 +22,7 @@ async function submitRequest(btn){const m=requestMessageEl(btn),category=documen
 function installProfileHotfix(){const btn=document.querySelector('#saveMyData');if(!btn||btn.dataset.jgosSaveFix==='1')return;btn.dataset.jgosSaveFix='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();saveProfile(btn)},true)}
 function installRequestHotfix(){const btn=document.querySelector('#createRequest');if(!btn||btn.dataset.jgosRequestFix==='1')return;btn.dataset.jgosRequestFix='1';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();submitRequest(btn)},true)}
 function installHotfixes(){installProfileHotfix();installRequestHotfix()}
+function loadRecovery(){if(document.querySelector('script[data-jgos-recovery]'))return;const r=document.createElement('script');r.src='auth-recovery.js?v='+VERSION;r.async=false;r.dataset.jgosRecovery='1';document.head.appendChild(r)}
+loadRecovery();
 const base=document.createElement('script');base.src='app-base.js?v='+VERSION;base.async=false;base.onload=()=>{installHotfixes();setTimeout(installHotfixes,300)};base.onerror=()=>{const m=document.querySelector('#loginMsg');if(m)m.textContent='J&G OS konnte nicht geladen werden.'};document.head.appendChild(base);
 })();
