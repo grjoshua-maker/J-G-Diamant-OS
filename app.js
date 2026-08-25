@@ -2,7 +2,7 @@
 const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
 const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
 const SK='jgos:session';
-const VERSION='20260825-2214';
+const VERSION='20260825-2218';
 
 function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
 function store(s){s?localStorage.setItem(SK,JSON.stringify(s)):localStorage.removeItem(SK)}
@@ -24,6 +24,8 @@ function installRequestHotfix(){const btn=document.querySelector('#createRequest
 function installAdminRequestView(){const role=document.querySelector('#userRole')?.textContent.trim();if(!['Administrator','Team'].includes(role))return false;const view=document.querySelector('#view-requests');if(!view)return false;const split=view.querySelector('.split');const panels=split?[...split.querySelectorAll(':scope > .panel')]:[];if(panels[0])panels[0].style.display='none';if(split)split.style.gridTemplateColumns='1fr';const eye=view.querySelector('.eyebrow');if(eye)eye.textContent='ADMIN · SERVICE INTAKE';const title=view.querySelector('.title');if(title)title.textContent='Kundenanfragen';const sub=view.querySelector('.sub');if(sub)sub.textContent='Eingegangene Kundenanfragen prüfen, priorisieren und im Status weiterführen.';const listTitle=panels[1]?.querySelector('.ph b');if(listTitle)listTitle.textContent='Eingegangene Kundenanfragen';view.dataset.adminRequests='1';return true}
 function installHotfixes(){installProfileHotfix();installRequestHotfix();installAdminRequestView()}
 function loadRecovery(){if(document.querySelector('script[data-jgos-recovery]'))return;const r=document.createElement('script');r.src='auth-recovery.js?v='+VERSION;r.async=false;r.dataset.jgosRecovery='1';document.head.appendChild(r)}
+function loadAdminRequestViewer(){if(document.querySelector('script[data-jgos-request-viewer]'))return;const r=document.createElement('script');r.src='admin-request-viewer.js?v='+VERSION;r.async=false;r.dataset.jgosRequestViewer='1';document.head.appendChild(r)}
 loadRecovery();
+loadAdminRequestViewer();
 const base=document.createElement('script');base.src='app-base.js?v='+VERSION;base.async=false;base.onload=()=>{installHotfixes();let tries=0;const timer=setInterval(()=>{tries++;if(installAdminRequestView()||tries>20)clearInterval(timer)},250);setTimeout(installHotfixes,300)};base.onerror=()=>{const m=document.querySelector('#loginMsg');if(m)m.textContent='J&G OS konnte nicht geladen werden.'};document.head.appendChild(base);
 })();
