@@ -2,7 +2,7 @@
 const U='https://qgrsbqzhbifbyyfbslyh.supabase.co';
 const K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k';
 const SK='jgos:session';
-const VERSION='20260825-2310';
+const VERSION='20260825-2314';
 function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
 function store(s){s?localStorage.setItem(SK,JSON.stringify(s)):localStorage.removeItem(SK)}
 async function refresh(s){if(!s?.refresh_token)return s;const r=await fetch(U+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:K,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:s.refresh_token}),cache:'no-store'});if(!r.ok)return s;const n=await r.json();store(n);return n}
@@ -18,6 +18,11 @@ function installRequestHotfix(){const btn=document.querySelector('#createRequest
 function installAdminRequestView(){const role=document.querySelector('#userRole')?.textContent.trim();if(!['Administrator','Team','CEO'].includes(role))return false;const view=document.querySelector('#view-requests');if(!view)return false;const split=view.querySelector('.split');const panels=split?[...split.querySelectorAll(':scope > .panel')]:[];if(panels[0])panels[0].style.display='none';if(split)split.style.gridTemplateColumns='1fr';const eye=view.querySelector('.eyebrow');if(eye)eye.textContent='ADMIN · SERVICE INTAKE';const title=view.querySelector('.title');if(title)title.textContent='Kundenanfragen';const sub=view.querySelector('.sub');if(sub)sub.textContent='Eingegangene Kundenanfragen prüfen, priorisieren und im Status weiterführen.';const listTitle=panels[1]?.querySelector('.ph b');if(listTitle)listTitle.textContent='Eingegangene Kundenanfragen';return true}
 function installHotfixes(){installProfileHotfix();installRequestHotfix();installAdminRequestView()}
 function loadScript(src,key){if(document.querySelector(`script[data-${key}]`))return;const r=document.createElement('script');r.src=src+'?v='+VERSION;r.async=false;r.setAttribute('data-'+key,'1');document.head.appendChild(r)}
-loadScript('auth-recovery.js','jgos-recovery');loadScript('admin-request-viewer.js','jgos-request-viewer');loadScript('employee-access.js','jgos-employee-access');loadScript('employee-access-nav-fix.js','jgos-employee-nav-fix');
+loadScript('auth-recovery.js','jgos-recovery');
+loadScript('admin-request-viewer.js','jgos-request-viewer');
+loadScript('role-display.js','jgos-role-display');
+loadScript('employee-access.js','jgos-employee-access');
+loadScript('employee-access-nav-fix.js','jgos-employee-nav-fix');
+loadScript('mobile-menu-close.js','jgos-mobile-menu-close');
 const base=document.createElement('script');base.src='app-base.js?v='+VERSION;base.async=false;base.onload=()=>{installHotfixes();let tries=0;const timer=setInterval(()=>{tries++;if(installAdminRequestView()||tries>20)clearInterval(timer)},250);setTimeout(installHotfixes,300)};base.onerror=()=>{const m=document.querySelector('#loginMsg');if(m)m.textContent='J&G OS konnte nicht geladen werden.'};document.head.appendChild(base);
 })();
