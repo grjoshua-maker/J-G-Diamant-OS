@@ -1,0 +1,10 @@
+(()=>{
+const U='https://qgrsbqzhbifbyyfbslyh.supabase.co',K='sb_publishable_DKxNrYb1zbLkKyQQ_LAh2w_B0NRK72k',SK='jgos:session';
+let loading=false,lastSignature='';
+function session(){try{return JSON.parse(localStorage.getItem(SK)||'null')}catch{return null}}
+function staff(){return ['CEO','Administrator','Team'].includes(document.querySelector('#userRole')?.textContent.trim())}
+async function api(path){const s=session();if(!s?.access_token)return[];const r=await fetch(U+'/rest/v1/'+path,{headers:{apikey:K,Authorization:'Bearer '+s.access_token},cache:'no-store'});if(!r.ok)throw new Error(await r.text());return await r.json()}
+async function sync(){const sel=document.querySelector('#serviceProject');if(!sel||!staff()||loading)return;loading=true;try{const projects=await api('projects?select=id,title,user_id,status&order=created_at.desc');const sig=projects.map(p=>p.id+':'+p.title).join('|');const optionIds=[...sel.options].map(o=>o.value).filter(Boolean).join('|');const projectIds=projects.map(p=>p.id).join('|');if(sig===lastSignature&&optionIds===projectIds)return;const selected=sel.value;sel.innerHTML='<option value="">Ohne Projekt</option>';projects.forEach(p=>{const o=document.createElement('option');o.value=p.id;o.textContent=p.title+(p.status==='approved'?' · Freigegeben':'');sel.appendChild(o)});if(selected&&projects.some(p=>p.id===selected))sel.value=selected;lastSignature=sig;let hint=document.querySelector('#serviceProjectSyncHint');if(!hint){hint=document.createElement('div');hint.id='serviceProjectSyncHint';hint.className='rd';hint.style.marginTop='6px';sel.insertAdjacentElement('afterend',hint)}hint.textContent=projects.length?projects.length+' Projekt'+(projects.length===1?'':'e')+' verfügbar.':'Keine Projekte verfügbar.'}catch(e){console.warn('J&G service project sync',e)}finally{loading=false}}
+function tick(){const view=document.querySelector('#view-services');if(view?.classList.contains('active'))sync()}
+new MutationObserver(tick).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['class']});setInterval(tick,1500);setTimeout(sync,900);
+})();
